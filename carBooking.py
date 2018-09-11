@@ -148,18 +148,18 @@ class Book_Your_Car:
         self.vehicleList.configure(setgrid="1")
         self.vehicleList.configure(width=954)
 
-        self.pModeSpinbox = Spinbox(top, from_=1.0, to=100.0)
+        self.pModeSpinbox = Spinbox(top, values=("Card", "Net Banking", "Cash"))
         self.pModeSpinbox.place(relx=0.32, rely=0.73, relheight=0.05
                                 , relwidth=0.28)
         self.pModeSpinbox.configure(activebackground="#f9f9f9")
         self.pModeSpinbox.configure(background="#000000")
         self.pModeSpinbox.configure(font=font9)
         self.pModeSpinbox.configure(foreground="#ffffff")
-        self.pModeSpinbox.configure(from_="1.0")
+        # self.pModeSpinbox.configure(from_="1.0")
         self.pModeSpinbox.configure(highlightbackground="black")
         self.pModeSpinbox.configure(relief=FLAT)
         self.pModeSpinbox.configure(selectbackground="#c4c4c4")
-        self.pModeSpinbox.configure(textvariable=carBooking_support.spinbox)
+        # self.pModeSpinbox.configure(textvariable=carBooking_support.spinbox)
         self.pModeSpinbox.configure(to="100.0")
         self.pModeSpinbox.configure(width=278)
 
