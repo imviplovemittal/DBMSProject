@@ -12,6 +12,7 @@ try:
     from Tkinter import *
 except ImportError:
     from tkinter import *
+    from tkinter import messagebox as tkMessageBox
 
 try:
     import ttk
@@ -36,6 +37,7 @@ def vp_start_gui():
 
 
 w = None
+vList = []
 
 
 def create_Book_Your_Car(root, *args, **kwargs):
@@ -62,10 +64,40 @@ def findVehicles():
 
 class Book_Your_Car:
     def onClickShowVehicles(self):
-        vList = list(findVehicles())
-        self.vehicleList.insert(END, "{:30s} {:10s} {:10s}".format('Vehicle', 'Price/km', 'No. of seats'))
-        for row in findVehicles():
-            self.vehicleList.insert(END, "{:30s} {:10s} {:10s}".format(row[0], str(row[1]), str(row[2])))
+        if self.startDate.get() == "" or self.kmsEntry.get() == "" or self.locationEntry.get() == "":
+            tkMessageBox.showwarning("Car Booking", "Please fill all the fields")
+        else:
+            self.vehicleList.delete(0, self.vehicleList.size())
+            self.vehicleList.insert(END, "{:30s} {:10s} {:10s}".format('Vehicle', 'Price/km', 'No. of seats'))
+            for row in findVehicles():
+                vList.append(row)
+                self.vehicleList.insert(END, "{:30s} {:10s} {:10s}".format(row[1], str(row[2]), str(row[3])))
+
+    def calculate_amount(self):
+        vTuple = self.vehicleList.curselection()
+        try:
+            row = vList[vTuple[0] - 1]
+            p_kms = row[2]
+            kms = self.kmsEntry.get()
+            if not kms.isdigit():
+                tkMessageBox.showwarning("Car Booking", "Enter Corret kms")
+            kms = int(kms)
+            amount = kms * p_kms
+            pType = self.pModeSpinbox.get()
+            if pType == 'Card':
+                amount += amount * 0.035
+            elif pType == 'Net Banking':
+                amount += amount * 0.020
+            self.amountLabel.config(text=("₹ " + str(amount) + "/-"))
+        except Exception as e:
+            print(e)
+
+    def on_click_pay(self):
+        vTuple = self.vehicleList.curselection()
+        row = vList[vTuple[0] - 1]
+        with dao.conn:
+            cur = dao.conn.cursor()
+            cur.execute("UPDATE vehicles SET left = left-1 WHERE v_num = ?", (row[0],))
 
     def __init__(self, top=None):
         '''This class configures and populates the toplevel window.
@@ -177,6 +209,7 @@ class Book_Your_Car:
         self.getAmountButton.configure(foreground="#ffffff")
         self.getAmountButton.configure(highlightbackground="#009600")
         self.getAmountButton.configure(text='''Get Amount''')
+        self.getAmountButton.configure(command=self.calculate_amount)
 
         self.Label6 = Label(top)
         self.Label6.place(relx=0.02, rely=0.81, height=38, width=275)
@@ -201,6 +234,7 @@ class Book_Your_Car:
         self.payButton.configure(font=font11)
         self.payButton.configure(foreground="#ffffff")
         self.payButton.configure(text='''Pay''')
+        self.payButton.configure(command=self.on_click_pay)
 
 
 if __name__ == '__main__':
