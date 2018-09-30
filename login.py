@@ -7,6 +7,7 @@
 
 import sys
 import dao
+import carBooking
 
 try:
     from Tkinter import *
@@ -68,8 +69,10 @@ class Login:
     def onLogin(self):
         id = self.loginId.get()
         passw = self.password.get()
-        if (check_password(id, passw)):
+        if check_password(id, passw):
             tkMessageBox.showinfo("Login Page", "The login is successfull")
+            carBooking.create_Book_Your_Car(root)
+            carBooking.getId(id)
         else:
             tkMessageBox.showwarning("LoginPage", "The username or password is incorrect")
 

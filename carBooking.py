@@ -7,6 +7,7 @@
 
 import sys
 import dao
+import random
 
 try:
     from Tkinter import *
@@ -26,6 +27,11 @@ except ImportError:
 import carBooking_support
 
 
+def getId(id):
+    global c_id
+    c_id = id
+
+
 def vp_start_gui():
     '''Starting point when module is the main routine.'''
     global val, w, root
@@ -38,11 +44,12 @@ def vp_start_gui():
 
 w = None
 vList = []
+c_id = 0
 
 
 def create_Book_Your_Car(root, *args, **kwargs):
     '''Starting point when module is imported by another program.'''
-    global w, w_win, rt
+    global w, w_win, rt, c_id
     rt = root
     w = Toplevel(root)
     carBooking_support.set_Tk_var()
@@ -82,13 +89,13 @@ class Book_Your_Car:
             if not kms.isdigit():
                 tkMessageBox.showwarning("Car Booking", "Enter Corret kms")
             kms = int(kms)
-            amount = kms * p_kms
+            self.amount += kms * p_kms
             pType = self.pModeSpinbox.get()
             if pType == 'Card':
-                amount += amount * 0.035
+                self.amount += self.amount * 0.035
             elif pType == 'Net Banking':
-                amount += amount * 0.020
-            self.amountLabel.config(text=("₹ " + str(amount) + "/-"))
+                self.amount += self.amount * 0.020
+            self.amountLabel.config(text=("₹ " + str(self.amount) + "/-"))
         except Exception as e:
             print(e)
 
@@ -98,10 +105,24 @@ class Book_Your_Car:
         with dao.conn:
             cur = dao.conn.cursor()
             cur.execute("UPDATE vehicles SET left = left-1 WHERE v_num = ?", (row[0],))
+            trip_id = random.randint(1000, 10000)
+            global c_id
+            start_date = self.startDate.get()
+            distance = int(self.kmsEntry.get())
+            driver = random.choice(dao.get_drivers()[0])
+            v_id = row[0]
+            cId = c_id
+            cur.execute("INSERT INTO trip VALUES (?,?,?,?,?,?,?)",
+                        (trip_id, cId, start_date, distance, driver, v_id, self.amount))
+            bill_id = random.randint(100, 10000)
+            cur.execute("INSERT INTO transactions VALUES (?,?,?,?)",
+                        (bill_id, trip_id, self.amount, self.pModeSpinbox.get()))
+            tkMessageBox.showinfo("Car Booking", "Thank you for Booking with us")
 
     def __init__(self, top=None):
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
+        self.amount = 0
         _bgcolor = '#d9d9d9'  # X11 color: 'gray85'
         _fgcolor = '#000000'  # X11 color: 'black'
         _compcolor = '#d9d9d9'  # X11 color: 'gray85'

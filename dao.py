@@ -12,5 +12,7 @@ def get_vehicles():
     return conn.execute("select v_num,type,price_km,no_of_passengers from vehicles where left>0")
 
 
+def get_drivers():
+    return list(conn.execute("SELECT d_id FROM drivers"))
 
 # conn.close()
