@@ -8,6 +8,7 @@
 import sys
 import dao
 import random
+from PIL import Image as Img, ImageDraw, ImageFont
 
 try:
     from Tkinter import *
@@ -69,6 +70,30 @@ def findVehicles():
     return cursor
 
 
+def generate_bill(c_id, driver, start_date, distance, v_id, v_name, amount, bill_id, pmode):
+    img = Img.new('RGB', (400, 700), color=(255, 255, 255))
+    font = ImageFont.truetype("/usr/share/fonts/dejavu/DejaVuSans.ttf", 18)
+    d = ImageDraw.Draw(img)
+    d.text((120, 20), "Customer Receipt", fill=(0, 0, 0), font=font)
+    driverd = dao.get_d_details(driver)
+    d.text((30, 55),
+           "Customer Name: {} \nDriver Name: {} \nDriver Phone: {} \nTrip Date: {} \nDistance: {} kms \nVehicle No.: {} \nVehicle: {}".format(
+               dao.get_name(c_id)[0][0], driverd[0][0],
+               driverd[0][1], start_date, distance, v_id, v_name), fill=(0, 0, 255), font=font)
+    if pmode == 'Card':
+        b_amt = amount - amount * 0.035
+    elif pmode == 'Net Banking':
+        b_amt = amount - amount * 0.025
+    else:
+        b_amt = amount
+    d.text((30, 300),
+           "Base Amount: ₹{}/-\nTaxes:₹{}/-\n---------------\nTotal: ₹{}/-\n\nBill Id: {}".format(b_amt,
+                                                                                                  str(amount - b_amt),
+                                                                                                  str(amount), bill_id),
+           fill=(0, 0, 255), font=font)
+    img.save('Bill{}.png'.format(bill_id))
+
+
 class Book_Your_Car:
     def onClickShowVehicles(self):
         if self.startDate.get() == "" or self.kmsEntry.get() == "" or self.locationEntry.get() == "":
@@ -117,7 +142,10 @@ class Book_Your_Car:
             bill_id = random.randint(100, 10000)
             cur.execute("INSERT INTO transactions VALUES (?,?,?,?)",
                         (bill_id, trip_id, self.amount, self.pModeSpinbox.get()))
-            tkMessageBox.showinfo("Car Booking", "Thank you for Booking with us")
+            tkMessageBox.showinfo("Car Booking", "Thank you for Booking with us.\n Your Bill is generated and saved")
+            generate_bill(cId, driver, start_date, distance, v_id, row[1], self.amount, bill_id,
+                          self.pModeSpinbox.get())
+            root.destroy()
 
     def __init__(self, top=None):
         '''This class configures and populates the toplevel window.

@@ -37,6 +37,11 @@ def vp_start_gui():
     root.mainloop()
 
 
+def get_root(r):
+    global root
+    root = r
+
+
 w = None
 
 
