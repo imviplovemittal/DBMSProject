@@ -28,9 +28,11 @@ except ImportError:
 import carBooking_support
 
 
-def getId(id):
+def getId(id, rt):
     global c_id
     c_id = id
+    global root
+    root = rt
 
 
 def vp_start_gui():
@@ -77,7 +79,7 @@ def generate_bill(c_id, driver, start_date, distance, v_id, v_name, amount, bill
     d.text((120, 20), "Customer Receipt", fill=(0, 0, 0), font=font)
     driverd = dao.get_d_details(driver)
     d.text((30, 55),
-           "Customer Name: {} \nDriver Name: {} \nDriver Phone: {} \nTrip Date: {} \nDistance: {} kms \nVehicle No.: {} \nVehicle: {}".format(
+           "Customer Name:      {} \nDriver Name:        {} \nDriver Phone:       {} \nTrip Date:          {} \nDistance:           {} kms \nVehicle No.:        {} \nVehicle:            {}".format(
                dao.get_name(c_id)[0][0], driverd[0][0],
                driverd[0][1], start_date, distance, v_id, v_name), fill=(0, 0, 255), font=font)
     if pmode == 'Card':
@@ -87,9 +89,11 @@ def generate_bill(c_id, driver, start_date, distance, v_id, v_name, amount, bill
     else:
         b_amt = amount
     d.text((30, 300),
-           "Base Amount: ₹{}/-\nTaxes:₹{}/-\n---------------\nTotal: ₹{}/-\n\nBill Id: {}".format(b_amt,
-                                                                                                  str(amount - b_amt),
-                                                                                                  str(amount), bill_id),
+           "Base Amount: ₹{}/-\nTaxes:₹{}/-\n---------------------\nTotal: ₹{}/-\n\nBill Id: {}".format(b_amt,
+                                                                                                        str(
+                                                                                                            amount - b_amt),
+                                                                                                        str(amount),
+                                                                                                        bill_id),
            fill=(0, 0, 255), font=font)
     img.save('Bill{}.png'.format(bill_id))
 
@@ -142,10 +146,18 @@ class Book_Your_Car:
             bill_id = random.randint(100, 10000)
             cur.execute("INSERT INTO transactions VALUES (?,?,?,?)",
                         (bill_id, trip_id, self.amount, self.pModeSpinbox.get()))
-            tkMessageBox.showinfo("Car Booking", "Thank you for Booking with us.\n Your Bill is generated and saved")
-            generate_bill(cId, driver, start_date, distance, v_id, row[1], self.amount, bill_id,
-                          self.pModeSpinbox.get())
-            root.destroy()
+            # tkMessageBox.showinfo("Car Booking", "Thank you for Booking with us.\nYour Bill is generated and saved")
+            msgBox = tkMessageBox.askokcancel("Car Booking",
+                                              "Thank you for Booking with us.\n     Print Bill?")
+            if msgBox:
+                generate_bill(cId, driver, start_date, distance, v_id, row[1], self.amount, bill_id,
+                              self.pModeSpinbox.get())
+                root.destroy()
+            else:
+                msg1 = tkMessageBox.showerror("Car Booking", "Database already updated\nYour bill will not generated")
+                if msg1 == 'ok':
+                    root.destroy()
+            # root.destroy()
 
     def __init__(self, top=None):
         '''This class configures and populates the toplevel window.

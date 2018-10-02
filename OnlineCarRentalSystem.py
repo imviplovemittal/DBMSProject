@@ -7,6 +7,7 @@
 
 import sys
 import login
+import admin
 
 try:
     from Tkinter import *
@@ -59,6 +60,10 @@ class Online_Car_Rental_System:
         login.get_root(root)
         # controller.showFrame(Login)
 
+    def onClickAdmin(self):
+        admin.get_root(root)
+        admin.create_Admin_Access(root)
+
     def __init__(self, top=None):
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
@@ -100,6 +105,7 @@ class Online_Car_Rental_System:
         self.adminButton.configure(foreground="#f9f9f9")
         self.adminButton.configure(text='''Admin''')
         self.adminButton.configure(width=241)
+        self.adminButton.configure(command=self.onClickAdmin)
 
 
 if __name__ == '__main__':
