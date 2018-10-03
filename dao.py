@@ -35,4 +35,12 @@ def get_trips_by_vehicle():
 def get_trips_by_driver():
     return list(conn.execute("select count(trip_id),sum(distance), driver_id from trip group by driver_id"))
 
+
+def get_transactions():
+    return list(conn.execute("SELECT * FROM transactions"))
+
+
+def get_transactions_by_pmode():
+    return list(conn.execute("select count(bill_id),sum(amount), pmode from transactions group by pmode"))
+
 # conn.close()

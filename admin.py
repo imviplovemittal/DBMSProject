@@ -7,6 +7,7 @@
 
 import sys
 import trips
+import transactions
 
 try:
     from Tkinter import *
@@ -62,6 +63,9 @@ class Admin_Access:
     def onClickTrips(self):
         trips.create_Trips(root)
 
+    def onClickTransactions(self):
+        transactions.create_Transactions(root)
+
     def __init__(self, top=None):
         '''This class configures and populates the toplevel window.
            top is the toplevel containing window.'''
@@ -99,6 +103,7 @@ class Admin_Access:
         self.transactionButton.configure(image=self._img2)
         self.transactionButton.configure(text='''Button''')
         self.transactionButton.configure(width=161)
+        self.transactionButton.configure(command=self.onClickTransactions)
 
         self.transactionLabel = Label(top)
         self.transactionLabel.place(relx=0.55, rely=0.78, height=41, width=168)

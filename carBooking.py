@@ -89,10 +89,13 @@ def generate_bill(c_id, driver, start_date, distance, v_id, v_name, amount, bill
     else:
         b_amt = amount
     d.text((30, 300),
-           "Base Amount: ₹{}/-\nTaxes:₹{}/-\n---------------------\nTotal: ₹{}/-\n\nBill Id: {}".format(b_amt,
+           "Base Amount: ₹{}/-\nTaxes:₹{}/-\n---------------------\nTotal: ₹{}/-\n\nBill Id: {}".format(round(b_amt, 2),
                                                                                                         str(
-                                                                                                            amount - b_amt),
-                                                                                                        str(amount),
+                                                                                                            round(
+                                                                                                                amount - b_amt,
+                                                                                                                2)),
+                                                                                                        str(round(
+                                                                                                            amount, 2)),
                                                                                                         bill_id),
            fill=(0, 0, 255), font=font)
     img.save('Bill{}.png'.format(bill_id))
